@@ -106,7 +106,7 @@ def run_selects(c, blob_container, digest, version):
         try:
             c.execute(stmt.stmt)
         except ProgrammingError as e:
-            raise ProgrammingError('Error executing ' + stmt.stmt) from e
+            raise ProgrammingError(version + ': Error executing ' + stmt.stmt) from e
     blob_container.get(digest)
 
 
@@ -170,7 +170,7 @@ class StorageCompatibilityTest(NodeProvider, unittest.TestCase):
         for version, upgrade_segments in versions[1:]:
             cluster = self._new_cluster(version, nodes, self.CLUSTER_SETTINGS)
             cluster.start()
-            with connect(cluster.node().http_url) as conn:
+            with connect(cluster.node().http_url, error_trace=True) as conn:
                 cursor = conn.cursor()
                 wait_for_active_shards(cursor, 6)
                 if upgrade_segments:
