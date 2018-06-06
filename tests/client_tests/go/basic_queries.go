@@ -29,19 +29,25 @@ func main() {
 		return
 	}
 	fmt.Println(name)
-	commandTag, err := conn.Exec("create table t1 (x int)")
+	commandTag, err := conn.Exec("create table t1 (x int, ts timestamp)")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	fmt.Println(commandTag)
-	commandTag, err = conn.Exec("insert into t1 (x) values (1)")
+	commandTag, err = conn.Exec("insert into t1 (x, ts) values (1, '1972-12-09T06:00:00')")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	fmt.Println(commandTag)
 	commandTag, err = conn.Exec("refresh table t1")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	fmt.Println(commandTag)
+	var ts string
+	err = conn.QueryRow("select ts from t1").Scan(&ts)
 	if err != nil {
 		log.Fatal(err)
 		return
